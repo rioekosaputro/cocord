@@ -55,7 +55,7 @@ class _Buttons extends StatelessWidget {
       Expanded(
         child: FilledButton.icon(
           icon: const Icon(Icons.swap_horiz),
-          label: const Text('SWITCH ROOM'),
+          label: const Text('ROOMS'),
           onPressed: () => showRoomSheet(context),
         ),
       ),
