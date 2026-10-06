@@ -29,7 +29,6 @@ abstract class RadioBase extends ChangeNotifier {
   bool muted = false;
   bool transmitting = false;
   bool openMic = false;
-  bool scanning = false;
   bool chatVisible = false;
   int unread = 0;
   String? error;
@@ -47,16 +46,17 @@ abstract class RadioBase extends ChangeNotifier {
 
   bool get anyRemoteTx => peers.values.any((p) => p.transmitting);
 
-  String get freqLabel => Freq.fmt(settings.frequency);
+  String get roomName => settings.room.name;
 
-  void addMessage(ChatKind kind, String sender, String text) {
-    messages.add(ChatMessage(kind, sender, text));
+  void addMessage(ChatKind kind, String sender, String text,
+      [int colorIndex = 0]) {
+    messages.add(ChatMessage(kind, sender, text, colorIndex));
     if (messages.length > _maxMessages) messages.removeAt(0);
     if (kind != ChatKind.local && !chatVisible) unread++;
     notifyListeners();
   }
 
-  void addSystem(String text) => addMessage(ChatKind.system, 'SYSTEM', text);
+  void addSystem(String text) => addMessage(ChatKind.system, 'system', text);
 
   List<Map<String, dynamic>> iceServers() => [
         {'urls': 'stun:stun.l.google.com:19302'},

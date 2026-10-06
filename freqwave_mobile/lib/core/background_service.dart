@@ -14,7 +14,7 @@ class BackgroundService {
       androidNotificationOptions: AndroidNotificationOptions(
         channelId: 'cocord_radio',
         channelName: 'Cocord Radio',
-        channelDescription: 'Shown while Cocord is tuned in to a frequency.',
+        channelDescription: 'Shown while you are connected to a Cocord room.',
         channelImportance: NotificationChannelImportance.LOW,
         priority: NotificationPriority.LOW,
         onlyAlertOnce: true,
@@ -51,7 +51,7 @@ class BackgroundService {
     try {
       if (await FlutterForegroundTask.isRunningService) {
         await FlutterForegroundTask.updateService(
-          notificationTitle: 'Cocord // ON AIR',
+          notificationTitle: 'Cocord // In voice',
           notificationText: text,
         );
         return;
@@ -62,7 +62,7 @@ class BackgroundService {
           if (micGranted) ForegroundServiceTypes.microphone,
           ForegroundServiceTypes.mediaPlayback,
         ],
-        notificationTitle: 'Cocord // ON AIR',
+        notificationTitle: 'Cocord // In voice',
         notificationText: text,
       );
       if (result is ServiceRequestFailure) {

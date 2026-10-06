@@ -25,15 +25,17 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final freq = context.select<RadioController, String>((r) => r.freqLabel);
+    final room = context.select<RadioController, String>((r) => r.roomName);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
       child: Row(children: [
         const Icon(Icons.forum_outlined, color: AppColors.blue, size: 18),
         const SizedBox(width: 8),
-        Text('FREQ CHAT  #$freq',
+        Text('#$room',
             style: const TextStyle(
-                fontFamily: kMono, color: AppColors.blue, letterSpacing: 1)),
+                fontWeight: FontWeight.bold,
+                color: AppColors.blue,
+                fontSize: 16)),
       ]),
     );
   }
@@ -92,7 +94,7 @@ class _Bubble extends StatelessWidget {
                 style: TextStyle(
                     fontFamily: kMono,
                     fontSize: 10,
-                    color: mine ? AppColors.blue : AppColors.amber)),
+                    color: memberColor(m.colorIndex))),
             const SizedBox(height: 2),
             Text(m.text),
           ],
@@ -134,7 +136,7 @@ class _ComposerState extends State<_Composer> {
         onSubmitted: (_) => _send(),
         decoration: InputDecoration(
           counterText: '',
-          hintText: 'Transmit message to frequency…',
+          hintText: 'Message the room…',
           filled: true,
           fillColor: AppColors.card,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),

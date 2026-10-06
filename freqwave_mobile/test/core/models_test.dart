@@ -1,25 +1,20 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:cocord/core/models.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('Freq.clamp keeps value in range and rounds to 3 decimals', () {
-    expect(Freq.clamp(10), Freq.min);
-    expect(Freq.clamp(5000), Freq.max);
-    expect(Freq.clamp(144.80000001), 144.8);
-  });
-
-  test('Freq.key is topic-safe', () {
-    expect(Freq.key(144.8), '144_800');
-  });
-
-  test('sanitizeCallsign strips junk, uppercases, caps length', () {
-    expect(sanitizeCallsign('  viper-2 !!'), 'VIPER-2');
-    expect(sanitizeCallsign('abcdefghijklmnop'), 'ABCDEFGHIJKL');
-    expect(sanitizeCallsign('###'), 'BRAVO-06');
+  test('sanitizeName strips control chars, collapses spaces, caps length', () {
+    expect(sanitizeName('  Ali \n  Baba\u0000 '), 'Ali Baba');
+    expect(sanitizeName('x' * 50).length, Limits.maxName);
+    expect(sanitizeName('   '), 'Guest');
   });
 
   test('randomId is 10 chars and unique-ish', () {
     expect(randomId().length, 10);
     expect(randomId(), isNot(randomId()));
+  });
+
+  test('memberColor clamps out-of-range indexes', () {
+    expect(memberColor(-5), kMemberColors.first);
+    expect(memberColor(999), kMemberColors.last);
   });
 }

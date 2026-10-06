@@ -68,8 +68,7 @@ mixin PttMixin on RadioBase, BoomboxMixin {
     notifyListeners();
   }
 
-  void _announce(bool on) => signaling?.sendBroadcast(
-      {'t': 'tx', 'on': on, 'cs': settings.callsign});
+  void _announce(bool on) => signaling?.sendBroadcast({'t': 'tx', 'on': on});
 
   void _endTone() {
     if (settings.rogerBeep) sfx.rogerBeep();

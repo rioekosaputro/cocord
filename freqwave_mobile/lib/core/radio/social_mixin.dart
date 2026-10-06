@@ -6,7 +6,7 @@ import 'boombox_mixin.dart';
 import 'msg_utils.dart';
 import 'radio_base.dart';
 
-/// Chat, soundboard drops and frequency sharing.
+/// Chat, soundboard drops and room invites.
 mixin SocialMixin on RadioBase, BoomboxMixin {
   void sendChat(String raw) {
     final text = MsgUtils.str(raw, Limits.maxChat);
@@ -15,9 +15,13 @@ mixin SocialMixin on RadioBase, BoomboxMixin {
       toast?.call('Tune in to send messages');
       return;
     }
-    addMessage(ChatKind.local, settings.callsign, text);
-    signaling?.sendBroadcast(
-        {'t': 'chat', 'cs': settings.callsign, 'x': text});
+    addMessage(ChatKind.local, settings.displayName, text, settings.colorIndex);
+    signaling?.sendBroadcast({
+      't': 'chat',
+      'cs': settings.displayName,
+      'cl': settings.colorIndex,
+      'x': text,
+    });
   }
 
   void openChat() {
@@ -35,13 +39,13 @@ mixin SocialMixin on RadioBase, BoomboxMixin {
     sfx.soundboard(key);
     if (!joined) return;
     signaling?.sendBroadcast(
-        {'t': 'snd', 'cs': settings.callsign, 'n': key});
+        {'t': 'snd', 'cs': settings.displayName, 'n': key});
     addSystem('You dropped sound: ${def.first.label.toUpperCase()}');
   }
 
-  Future<void> shareFrequency() async {
-    await Clipboard.setData(ClipboardData(
-        text: 'Join me on Cocord: tune to $freqLabel MHz'));
-    toast?.call('Frequency copied to clipboard');
+  /// Copies a tappable invite for the current room to the clipboard.
+  Future<void> shareInvite() async {
+    await Clipboard.setData(ClipboardData(text: settings.room.invite));
+    toast?.call('Invite copied. Paste it to your friends!');
   }
 }

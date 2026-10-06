@@ -6,7 +6,7 @@ import '../signaling.dart';
 import 'radio_base.dart';
 
 /// Synced boombox: internet radio streams, shared play/station state across
-/// the frequency, and auto-ducking while anyone is transmitting.
+/// the room, and auto-ducking while anyone is transmitting.
 mixin BoomboxMixin on RadioBase {
   static const double _duckFactor = 0.25;
 

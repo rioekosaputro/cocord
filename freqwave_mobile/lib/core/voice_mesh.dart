@@ -14,7 +14,7 @@ class _Link {
   _Link(this.peerId, this.offerer);
 }
 
-/// Full-mesh WebRTC audio between everyone on a frequency.
+/// Full-mesh WebRTC audio between everyone in a room.
 /// The local mic track stays disabled (silent) until [setTransmit] is true.
 /// Without a mic the mesh runs in listen-only mode.
 class VoiceMesh {

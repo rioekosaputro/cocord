@@ -10,7 +10,7 @@ import 'boombox_mixin.dart';
 import 'ptt_mixin.dart';
 import 'radio_base.dart';
 
-/// Joining / leaving the frequency: permissions, MQTT link, voice mesh,
+/// Connecting to / leaving the room: permissions, MQTT link, voice mesh,
 /// presence heartbeat and the background service.
 mixin SessionMixin on RadioBase, BoomboxMixin, PttMixin {
   static const _helloEvery = Duration(seconds: 10);
@@ -84,16 +84,17 @@ mixin SessionMixin on RadioBase, BoomboxMixin, PttMixin {
   }
 
   void _enterRoom() {
-    signaling?.joinRoom(Freq.key(settings.frequency));
+    signaling?.joinRoom(settings.room.key);
     sendHello(reply: true);
-    addSystem('Tuned to $freqLabel MHz'
+    addSystem('You joined #$roomName'
         '${micGranted ? '' : ' (listen-only: mic not allowed)'}');
   }
 
   void sendHello({bool reply = false}) {
     signaling?.sendBroadcast({
       't': 'hello',
-      'cs': settings.callsign,
+      'cs': settings.displayName,
+      'cl': settings.colorIndex,
       'bx': boomboxState(),
       if (reply) 'r': true,
     });
@@ -126,9 +127,9 @@ mixin SessionMixin on RadioBase, BoomboxMixin, PttMixin {
     notifyListeners();
   }
 
-  String _status() => '$freqLabel MHz · ${peers.length} on frequency';
+  String _status() => '#$roomName · ${peers.length + 1} in voice';
 
-  /// Move to the (already updated) frequency in `settings.frequency`.
+  /// Move to the (already updated) room in `settings.room`.
   void switchRoom() {
     if (!joined) return;
     _switchTimer?.cancel();

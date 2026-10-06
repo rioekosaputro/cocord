@@ -36,6 +36,6 @@ class StatusBar extends StatelessWidget {
     }
     if (!r.joined) return ('OFFLINE', AppColors.red);
     final n = r.peers.length;
-    return ('ON AIR · $n PEER${n == 1 ? '' : 'S'}', AppColors.green);
+    return ('IN VOICE · ${n + 1}', AppColors.green);
   }
 }

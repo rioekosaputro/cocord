@@ -11,7 +11,7 @@ typedef Json = Map<String, dynamic>;
 
 /// Presence, chat and WebRTC signaling over an MQTT broker.
 ///
-/// Topics (per frequency room):
+/// Topics (per room):
 ///   cocord/v1/<freq>/b            room broadcast (hello/bye/chat/tx/snd/bx)
 ///   cocord/v1/<freq>/s/<peerId>   direct WebRTC signaling to one peer
 class Signaling {
@@ -32,7 +32,7 @@ class Signaling {
 
   MqttServerClient? _client;
   StreamSubscription? _sub;
-  String? _room; // current frequency key
+  String? _room; // current room key
   NetState _state = NetState.offline;
   bool _disposed = false;
   String connectedTo = '';
@@ -106,7 +106,7 @@ class Signaling {
 
   String _base(String room) => 'cocord/v1/$room';
 
-  /// Enter a frequency room (leaving the previous one).
+  /// Enter a room (leaving the previous one).
   void joinRoom(String room) {
     final c = _client;
     if (c == null) return;

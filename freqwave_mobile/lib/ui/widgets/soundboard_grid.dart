@@ -5,7 +5,7 @@ import '../../core/radio/radio_controller.dart';
 import '../../core/synth.dart';
 import '../theme.dart';
 
-/// Tactical soundboard: tap to play locally and drop it on the frequency.
+/// Soundboard: tap to play locally and drop it in the room.
 class SoundboardGrid extends StatelessWidget {
   const SoundboardGrid({super.key});
 

@@ -8,8 +8,8 @@ import 'incoming_mixin.dart';
 import 'ptt_mixin.dart';
 import 'radio_base.dart';
 import 'session_mixin.dart';
+import 'rooms_mixin.dart';
 import 'social_mixin.dart';
-import 'tuning_mixin.dart';
 
 /// Single source of truth for the UI. Behaviour is split across the mixins.
 class RadioController extends RadioBase
@@ -18,7 +18,7 @@ class RadioController extends RadioBase
         PttMixin,
         IncomingMixin,
         SessionMixin,
-        TuningMixin,
+        RoomsMixin,
         SocialMixin,
         DevicesMixin {
   bool ready = false;
@@ -28,6 +28,8 @@ class RadioController extends RadioBase
     await sfx.init();
     initBoombox();
     attachHardwareKeys();
+    settings.remember(settings.room);
+    unawaited(attachLinks());
     await sfx.setStatic(settings.staticNoise, settings.staticVolume);
     ready = true;
     notifyListeners();
@@ -41,9 +43,9 @@ class RadioController extends RadioBase
     notifyListeners();
   }
 
-  void setCallsign(String raw) {
-    settings.callsign = sanitizeCallsign(raw);
-    addSystem('Callsign set to ${settings.callsign}');
+  void setProfile({String? name, int? colorIndex}) {
+    if (name != null) settings.displayName = sanitizeName(name);
+    if (colorIndex != null) settings.colorIndex = colorIndex;
     sendHello();
     _persist();
   }
@@ -107,7 +109,6 @@ class RadioController extends RadioBase
 
   @override
   void dispose() {
-    stopScan();
     leave();
     sfx.dispose();
     disposeBoombox();

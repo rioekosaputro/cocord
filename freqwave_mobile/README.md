@@ -1,24 +1,25 @@
 # Cocord Mobile
 
-Walkie-talkie voice, frequency chat and a synced boombox for Android.
-Everyone tuned to the same frequency (e.g. 144.800 MHz) is in the same room.
+Voice rooms, chat and a synced music box for you and your friends. Android.
 
 ## Features
 
-- **Voice (PTT)**: hold the on-screen button, the volume-down key or a hardware PTT key. Live WebRTC audio, full mesh (up to 8 radios per frequency). Optional open-mic.
-- **Frequency tuning**: ±0.05 step, slider, type an exact value (88–999 MHz), presets, scanner that stops on activity.
-- **Chat**: live text chat per frequency, join/leave notices, unread badge.
-- **Synced boombox**: 4 internet radio stations; station and play/pause follow everyone on the frequency; music auto-ducks while anyone transmits.
-- **Soundboard**: airhorn, siren, Morse SOS, etc. played locally and dropped on the frequency.
-- **Radio sounds**: squelch bursts, roger beep, optional static (all synthesized on device, individually switchable).
-- **Background**: foreground service keeps the radio alive with the screen off.
+- **Rooms**: create or join a room by name. Add a password to make it private. Share an invite link that opens the app straight into the room (`cocord://join?...`).
+- **Voice**: hold the big button (or the volume-down key) to talk, or switch on open mic. Live WebRTC audio, full mesh (up to 8 people per room).
+- **Profile**: your own display name and avatar color; the speaking member lights up.
+- **Chat**: live text chat per room with join/leave notices and an unread badge.
+- **Boombox**: 4 internet radio stations; station and play/pause follow everyone in the room; music ducks while anyone talks.
+- **Soundboard**: airhorn, siren, Morse SOS, etc. played locally and dropped in the room.
+- **Audio devices**: pick your speaker and microphone (built-in, wired, Bluetooth); remembered.
+- **Background**: a foreground service keeps you connected with the screen off.
 - **Listen-only mode** when the microphone permission is denied.
 
 ## How it works
 
 - Presence, chat and WebRTC signaling go through a public MQTT broker (`broker.emqx.io`, falling back to HiveMQ / Mosquitto); voice goes peer-to-peer over WebRTC.
-- **Privacy note:** frequencies are public rooms. Anyone who tunes to the same frequency can hear you and read chat. Pick an unusual frequency for private use, or set your own broker in *Settings → Advanced network*.
-- Calls use STUN only by default. On some mobile carriers / strict NATs a TURN server is needed for voice; add yours in *Settings → Advanced network*.
+- A room's network topic is a hash of its name **and** password. Without the password nobody can find or join a private room. Messages themselves are not end-to-end encrypted, so treat the public broker as semi-public.
+- Public rooms (no password) can be joined by anyone who types the same name. The default room is `general`.
+- Needs internet. STUN only by default; strict mobile carriers may need a TURN server (*Settings → Advanced network*). You can also point the app at your own MQTT broker there.
 
 ## Build the ARM64 APK
 

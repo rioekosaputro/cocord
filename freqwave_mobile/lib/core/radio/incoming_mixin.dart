@@ -5,7 +5,7 @@ import 'msg_utils.dart';
 import 'radio_base.dart';
 import '../synth.dart';
 
-/// Handles every message arriving from other radios on the frequency.
+/// Handles every message arriving from other members of the room.
 /// All payloads are untrusted: each field is validated before use.
 mixin IncomingMixin on RadioBase, BoomboxMixin {
   final Map<String, DateTime> _lastSound = {};
@@ -33,15 +33,20 @@ mixin IncomingMixin on RadioBase, BoomboxMixin {
   @override
   void handleDirect(Json msg) => mesh?.onSignal(msg['id'] as String, msg);
 
-  String _name(Json m) =>
-      MsgUtils.str(m['cs'], Limits.maxCallsign) ?? 'UNKNOWN';
+  String _name(Json m) => MsgUtils.str(m['cs'], Limits.maxName) ?? 'Guest';
+
+  int _color(Json m) {
+    final c = m['cl'];
+    return c is int ? c.clamp(0, kMemberColors.length - 1) : 0;
+  }
 
   void _onHello(String id, Json m) {
     var peer = peers[id];
     final isNew = peer == null;
     if (isNew && peers.length >= Limits.maxPeers) return;
-    peer = peers.putIfAbsent(id, () => Peer(id, _name(m)));
-    peer.callsign = _name(m);
+    peer = peers.putIfAbsent(id, () => Peer(id, _name(m), _color(m)));
+    peer.name = _name(m);
+    peer.colorIndex = _color(m);
     peer.lastSeen = DateTime.now();
     if (MsgUtils.flag(m['r'])) signaling?.sendBroadcast(_helloMsg());
     _linkIfNeeded(peer);
@@ -49,8 +54,12 @@ mixin IncomingMixin on RadioBase, BoomboxMixin {
     notifyListeners();
   }
 
-  Json _helloMsg() =>
-      {'t': 'hello', 'cs': settings.callsign, 'bx': boomboxState()};
+  Json _helloMsg() => {
+        't': 'hello',
+        'cs': settings.displayName,
+        'cl': settings.colorIndex,
+        'bx': boomboxState(),
+      };
 
   void _linkIfNeeded(Peer peer) {
     final voice = mesh;
@@ -61,7 +70,7 @@ mixin IncomingMixin on RadioBase, BoomboxMixin {
   }
 
   void _announceJoin(Peer peer, Json m) {
-    addSystem('${peer.callsign} joined $freqLabel MHz');
+    addSystem('${peer.name} joined');
     final bx = m['bx'];
     if (bx is Map) applyRemoteBoombox(Map<String, dynamic>.from(bx));
   }
@@ -69,7 +78,7 @@ mixin IncomingMixin on RadioBase, BoomboxMixin {
   void _onBye(String id) {
     final peer = peers.remove(id);
     mesh?.drop(id);
-    if (peer != null) addSystem('${peer.callsign} left the frequency');
+    if (peer != null) addSystem('${peer.name} left');
     updateDuck();
     notifyListeners();
   }
@@ -77,7 +86,7 @@ mixin IncomingMixin on RadioBase, BoomboxMixin {
   void _onChat(String id, Json m) {
     final text = MsgUtils.str(m['x'], Limits.maxChat);
     if (text == null) return;
-    addMessage(ChatKind.remote, _name(m), text);
+    addMessage(ChatKind.remote, _name(m), text, _color(m));
   }
 
   void _onTx(String id, Json m) {

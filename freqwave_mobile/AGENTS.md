@@ -23,6 +23,7 @@ lib/
   main.dart                 entry point only: init + runApp (≤ 40 lines)
   core/                     pure Dart + platform services, NO widgets
     models.dart             plain data classes / enums / constants
+    room.dart               room identity, password hashing, invites
     settings.dart           persisted preferences
     synth.dart, sfx.dart    sound synthesis and playback
     signaling.dart          MQTT presence/chat/WebRTC signaling
@@ -54,7 +55,7 @@ test/                       mirrors lib/ one-to-one
 ## 4. State & architecture
 
 - UI is dumb: widgets render state and forward events. No networking, audio or timers in widgets.
-- `RadioController` (ChangeNotifier) is the single source of truth. Its parts live in `core/radio/` as focused mixins/services (session, ptt, chat, boombox, scanner…), each ≤ 300 lines.
+- `RadioController` (ChangeNotifier) is the single source of truth. Its parts live in `core/radio/` as focused mixins/services (session, rooms, ptt, social, boombox, devices…), each ≤ 300 lines.
 - Call `notifyListeners()` once per state change batch, not in loops. Use `context.select` for fine-grained rebuilds.
 - Every `Timer`, `StreamSubscription`, `AudioPlayer`, `RTCPeerConnection`, `MediaStream` has an owner and is cancelled/disposed in `dispose()`/`leave()`.
 - All async calls that can fail are wrapped; failures surface as a user-visible message or a `debugPrint`, never a silent crash.

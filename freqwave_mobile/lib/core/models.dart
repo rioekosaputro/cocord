@@ -1,35 +1,6 @@
 import 'dart:math';
 
-/// Frequency helpers. A "frequency" is a virtual room (e.g. 144.800 MHz).
-class Freq {
-  static const double min = 88.0;
-  static const double max = 999.0;
-  static const double defaultFreq = 144.800;
-  static const double step = 0.05;
-
-  static double clamp(double f) =>
-      double.parse(f.clamp(min, max).toStringAsFixed(3));
-
-  static String fmt(double f) => f.toStringAsFixed(3);
-
-  /// Topic-safe key, "144.800" -> "144_800".
-  static String key(double f) => fmt(f).replaceAll('.', '_');
-}
-
-class FreqPreset {
-  final String name;
-  final double freq;
-  const FreqPreset(this.name, this.freq);
-}
-
-const List<FreqPreset> kPresets = [
-  FreqPreset('Squad Alpha', 144.800),
-  FreqPreset('Squad Bravo', 433.920),
-  FreqPreset('Command Net', 121.500),
-  FreqPreset('Open Chatter', 446.000),
-  FreqPreset('Night Watch', 98.500),
-  FreqPreset('Recon', 104.200),
-];
+import 'package:flutter/painting.dart';
 
 class Station {
   final String name;
@@ -49,9 +20,25 @@ const List<Station> kStations = [
       'https://stream.nightride.fm/spacesynth.mp3'),
 ];
 
+/// Avatar colors a member can pick; only the index travels over the network.
+const List<Color> kMemberColors = [
+  Color(0xFF3B82F6),
+  Color(0xFF10B981),
+  Color(0xFFF59E0B),
+  Color(0xFFEF4444),
+  Color(0xFFA855F7),
+  Color(0xFFEC4899),
+  Color(0xFF14B8A6),
+  Color(0xFF84CC16),
+];
+
+Color memberColor(int index) =>
+    kMemberColors[index.clamp(0, kMemberColors.length - 1)];
+
 class Peer {
   final String id;
-  String callsign;
+  String name;
+  int colorIndex;
   bool transmitting = false;
   DateTime? txSince;
   DateTime lastSeen = DateTime.now();
@@ -59,7 +46,7 @@ class Peer {
   /// Voice link state: new | connecting | connected | failed
   String link = 'new';
 
-  Peer(this.id, this.callsign);
+  Peer(this.id, this.name, this.colorIndex);
 }
 
 enum ChatKind { local, remote, system }
@@ -67,17 +54,24 @@ enum ChatKind { local, remote, system }
 class ChatMessage {
   final ChatKind kind;
   final String sender;
+  final int colorIndex;
   final String text;
   final DateTime time = DateTime.now();
-  ChatMessage(this.kind, this.sender, this.text);
+  ChatMessage(this.kind, this.sender, this.text, [this.colorIndex = 0]);
 }
 
 enum NetState { offline, connecting, online }
 
-String sanitizeCallsign(String raw) {
-  var s = raw.toUpperCase().replaceAll(RegExp(r'[^A-Z0-9\- ]'), '').trim();
-  if (s.length > 12) s = s.substring(0, 12).trim();
-  return s.isEmpty ? 'BRAVO-06' : s;
+/// Display name: printable text, collapsed spaces, at most [Limits.maxName].
+String sanitizeName(String raw) {
+  final clean = raw
+      .replaceAll(RegExp(r'[\u0000-\u001F\u007F]'), '')
+      .replaceAll(RegExp(r'\s+'), ' ')
+      .trim();
+  final cut = clean.length > Limits.maxName
+      ? clean.substring(0, Limits.maxName).trim()
+      : clean;
+  return cut.isEmpty ? 'Guest' : cut;
 }
 
 String randomId() {
@@ -88,8 +82,11 @@ String randomId() {
 /// Limits shared by networking code and tests.
 class Limits {
   static const int maxChat = 500;
-  static const int maxCallsign = 12;
+  static const int maxName = 20;
+  static const int maxRoomName = 32;
+  static const int maxPassword = 64;
   static const int maxPeers = 8;
+  static const int maxRecents = 8;
   static const Duration peerTimeout = Duration(seconds: 30);
   static const Duration txTimeout = Duration(seconds: 90);
   static const Duration soundCooldown = Duration(milliseconds: 600);

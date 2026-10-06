@@ -5,12 +5,11 @@ import '../../core/radio/radio_controller.dart';
 import '../theme.dart';
 import '../widgets/boombox_card.dart';
 import '../widgets/device_picker.dart';
-import '../widgets/freq_display.dart';
 import '../widgets/oscilloscope.dart';
 import '../widgets/peers_card.dart';
 import '../widgets/ptt_button.dart';
+import '../widgets/room_header.dart';
 import '../widgets/soundboard_grid.dart';
-import '../widgets/tuner_panel.dart';
 
 class RadioPage extends StatelessWidget {
   const RadioPage({super.key});
@@ -21,10 +20,8 @@ class RadioPage extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       children: const [
         _ConnectBanner(),
-        FreqDisplay(),
-        SizedBox(height: 8),
-        TunerPanel(),
-        SizedBox(height: 8),
+        RoomHeader(),
+        SizedBox(height: 12),
         _Scope(),
         SizedBox(height: 12),
         PttButton(),
@@ -33,7 +30,7 @@ class RadioPage extends StatelessWidget {
         SizedBox(height: 12),
         BoomboxCard(),
         SizedBox(height: 16),
-        SectionLabel('TACTICAL SOUNDBOARD'),
+        SectionLabel('SOUNDBOARD'),
         SoundboardGrid(),
         SizedBox(height: 16),
       ],
@@ -90,21 +87,13 @@ class _QuickToggles extends StatelessWidget {
               onPressed: () => showDeviceSheet(context),
             ),
           ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: ActionChip(
-              avatar: const Icon(Icons.share, size: 16),
-              label: const Text('SHARE'),
-              onPressed: r.shareFrequency,
-            ),
-          ),
         ],
       ),
     );
   }
 }
 
-/// Shown when not tuned in (or when connecting failed).
+/// Shown when not connected (or when connecting failed).
 class _ConnectBanner extends StatelessWidget {
   const _ConnectBanner();
 
@@ -121,13 +110,13 @@ class _ConnectBanner extends StatelessWidget {
             Expanded(
               child: Text(
                 r.joining
-                    ? 'Connecting to the radio network…'
-                    : (r.error ?? 'You are not tuned in.'),
+                    ? 'Connecting…'
+                    : (r.error ?? 'You are not connected.'),
                 style: const TextStyle(fontSize: 13),
               ),
             ),
             if (!r.joining)
-              FilledButton(onPressed: r.join, child: const Text('TUNE IN')),
+              FilledButton(onPressed: r.join, child: const Text('CONNECT')),
           ],
         ),
       ),
