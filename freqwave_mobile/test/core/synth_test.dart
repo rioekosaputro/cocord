@@ -18,10 +18,9 @@ void main() {
     }
   });
 
-  test('squelch, roger and static render valid WAVs', () {
-    _expectValidWav(Synth.squelch(keyup: true));
-    _expectValidWav(Synth.squelch(keyup: false));
+  test('chimes and beep render valid WAVs', () {
+    _expectValidWav(Synth.chime(up: true));
+    _expectValidWav(Synth.chime(up: false));
     _expectValidWav(Synth.rogerBeep());
-    _expectValidWav(Synth.staticLoop());
   });
 }

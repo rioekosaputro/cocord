@@ -59,43 +59,14 @@ class Synth {
     }
   }
 
-  /// Band-pass biquad (RBJ cookbook), applied in place.
-  static void _bandpass(Float64List x, double f0, double q) {
-    final w0 = 2 * pi * f0 / sr;
-    final alpha = sin(w0) / (2 * q);
-    final b0 = alpha, b2 = -alpha;
-    final a0 = 1 + alpha, a1 = -2 * cos(w0), a2 = 1 - alpha;
-    double x1 = 0, x2 = 0, y1 = 0, y2 = 0;
-    for (var i = 0; i < x.length; i++) {
-      final y = (b0 * x[i] + b2 * x2 - a1 * y1 - a2 * y2) / a0;
-      x2 = x1;
-      x1 = x[i];
-      y2 = y1;
-      y1 = y;
-      x[i] = y;
-    }
-  }
-
-  static Float64List _noise(int n) {
-    final o = Float64List(n);
-    for (var i = 0; i < n; i++) {
-      o[i] = _rnd.nextDouble() * 2 - 1;
-    }
-    return o;
-  }
-
   // ---- Effects -----------------------------------------------------------
 
-  /// Carrier key-up (short) / tail (longer) squelch burst.
-  static Uint8List squelch({required bool keyup}) {
-    final dur = keyup ? 0.04 : 0.09;
-    final n = (dur * sr).round();
-    final x = _noise(n);
-    _bandpass(x, keyup ? 1800 : 2200, 2.0);
-    for (var i = 0; i < n; i++) {
-      x[i] *= 3.0 * _env(i, n, 0.35);
-    }
-    return _wav(x);
+  /// Short two-note chime: rising when someone joins, falling when they leave.
+  static Uint8List chime({required bool up}) {
+    final o = _buf(0.3);
+    _tone(o, 0.0, 0.12, up ? 660 : 880, 0.45, _sine);
+    _tone(o, 0.09, 0.2, up ? 880 : 520, 0.45, _sine);
+    return _wav(o);
   }
 
   static Uint8List rogerBeep() {
@@ -164,20 +135,6 @@ class Synth {
     }
     return _wav(o);
   }
-
-  /// Two seconds of band-passed hiss, faded at both ends so it loops cleanly.
-  static Uint8List staticLoop() {
-    const n = 2 * sr;
-    final x = _noise(n);
-    _bandpass(x, 1200, 1.5);
-    const fade = 800;
-    for (var i = 0; i < fade; i++) {
-      final g = i / fade;
-      x[i] *= g;
-      x[n - 1 - i] *= g;
-    }
-    return _wav(x, gain: 4.0);
-  }
 }
 
 /// Soundboard entries: key, label, builder.
@@ -189,7 +146,7 @@ class SoundDef {
 }
 
 const List<SoundDef> kSoundboard = [
-  SoundDef('roger', 'Roger That', Synth.rogerBeep),
+  SoundDef('roger', 'Beep', Synth.rogerBeep),
   SoundDef('airhorn', 'Airhorn', Synth.airhorn),
   SoundDef('siren', 'Siren', Synth.siren),
   SoundDef('morse', 'Morse SOS', Synth.morseSos),

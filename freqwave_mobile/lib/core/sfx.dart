@@ -6,17 +6,13 @@ import 'package:path_provider/path_provider.dart';
 
 import 'synth.dart';
 
-/// Plays the synthesized radio sounds (squelch, roger beep, soundboard, hiss).
+/// Plays the short synthesized sounds (soundboard, join/leave chimes).
 /// Every effect owns a pre-loaded player so triggering it is near-instant.
 class Sfx {
   final Map<String, AudioPlayer> _players = {};
   final Map<String, Future<AudioPlayer?>> _loading = {};
   Directory? _dir;
   bool muted = false;
-  double _staticVolume = 0.12;
-  bool _staticOn = false;
-
-  static const _staticKey = 'static';
 
   Future<void> init() async {
     try {
@@ -26,11 +22,9 @@ class Sfx {
       debugPrint('[Sfx] temp dir error: $e');
       return;
     }
-    // Warm everything up in the background.
     final builders = <String, Uint8List Function()>{
-      'squelch_up': () => Synth.squelch(keyup: true),
-      'squelch_down': () => Synth.squelch(keyup: false),
-      'roger': Synth.rogerBeep,
+      'chime_up': () => Synth.chime(up: true),
+      'chime_down': () => Synth.chime(up: false),
       for (final s in kSoundboard) s.key: s.build,
     };
     for (final e in builders.entries) {
@@ -46,7 +40,7 @@ class Sfx {
         final file = File('${dir.path}/$key.wav');
         await file.writeAsBytes(build(), flush: true);
         final p = AudioPlayer(
-          handleInterruptions: false, handleAudioSessionActivation: false);
+            handleInterruptions: false, handleAudioSessionActivation: false);
         await p.setFilePath(file.path);
         _players[key] = p;
         return p;
@@ -57,28 +51,23 @@ class Sfx {
     });
   }
 
-  Future<void> _play(String key, Uint8List Function() build,
-      {double volume = 1.0}) async {
+  Future<void> _play(String key, Uint8List Function() build) async {
     if (muted) return;
     final p = await _load(key, build);
     if (p == null) return;
     try {
-      await p.setVolume(volume);
       await p.seek(Duration.zero);
-      // Don't await: play() completes when the clip finishes.
-      p.play();
+      p.play(); // completes when the clip ends; don't await
     } catch (e) {
       debugPrint('[Sfx] play $key failed: $e');
     }
   }
 
-  Future<void> squelchKeyup() =>
-      _play('squelch_up', () => Synth.squelch(keyup: true));
+  Future<void> joinChime() =>
+      _play('chime_up', () => Synth.chime(up: true));
 
-  Future<void> squelchTail() =>
-      _play('squelch_down', () => Synth.squelch(keyup: false));
-
-  Future<void> rogerBeep() => _play('roger', Synth.rogerBeep);
+  Future<void> leaveChime() =>
+      _play('chime_down', () => Synth.chime(up: false));
 
   Future<void> soundboard(String key) async {
     final def = kSoundboard.where((s) => s.key == key);
@@ -86,34 +75,11 @@ class Sfx {
     await _play(key, def.first.build);
   }
 
-  // ---- Ambient static ----------------------------------------------------
-
-  Future<void> setStatic(bool on, double volume) async {
-    _staticOn = on;
-    _staticVolume = volume;
-    final p = await _load(_staticKey, Synth.staticLoop);
-    if (p == null) return;
-    try {
-      await p.setVolume(volume.clamp(0.0, 1.0));
-      if (on && !muted) {
-        await p.setLoopMode(LoopMode.one);
-        if (!p.playing) p.play();
-      } else if (p.playing) {
-        await p.pause();
-      }
-    } catch (e) {
-      debugPrint('[Sfx] static error: $e');
-    }
-  }
-
   Future<void> setMuted(bool value) async {
     muted = value;
-    if (value) {
-      for (final p in _players.values) {
-        if (p.playing) await p.pause();
-      }
-    } else {
-      await setStatic(_staticOn, _staticVolume);
+    if (!value) return;
+    for (final p in _players.values) {
+      if (p.playing) await p.pause();
     }
   }
 
