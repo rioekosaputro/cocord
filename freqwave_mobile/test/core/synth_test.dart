@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:freqwave_mobile/core/synth.dart';
+import 'package:cocord/core/synth.dart';
 
 void _expectValidWav(Uint8List b) {
   expect(String.fromCharCodes(b.sublist(0, 4)), 'RIFF');

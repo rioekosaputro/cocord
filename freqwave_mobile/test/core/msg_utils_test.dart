@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:freqwave_mobile/core/radio/msg_utils.dart';
+import 'package:cocord/core/radio/msg_utils.dart';
 
 void main() {
   test('str rejects non-strings and empty text', () {

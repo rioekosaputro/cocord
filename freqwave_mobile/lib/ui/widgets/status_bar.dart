@@ -18,7 +18,7 @@ class StatusBar extends StatelessWidget {
         Icon(Icons.circle, size: 10, color: color),
         const SizedBox(width: 8),
         const Text(
-          'FREQWAVE',
+          'COCORD',
           style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2),
         ),
         const Spacer(),

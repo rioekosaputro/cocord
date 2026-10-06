@@ -1,4 +1,4 @@
-package com.freqwave.app
+package com.cocord.app
 
 import android.view.KeyEvent
 import io.flutter.embedding.android.FlutterActivity
@@ -6,7 +6,7 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
-    private val channelName = "com.freqwave.app/hardware_ptt"
+    private val channelName = "com.cocord.app/hardware_ptt"
     private var channel: MethodChannel? = null
     private var volumeKeyEnabled = true
 

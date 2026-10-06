@@ -12,8 +12,8 @@ typedef Json = Map<String, dynamic>;
 /// Presence, chat and WebRTC signaling over an MQTT broker.
 ///
 /// Topics (per frequency room):
-///   freqwave/v1/<freq>/b            room broadcast (hello/bye/chat/tx/snd/bx)
-///   freqwave/v1/<freq>/s/<peerId>   direct WebRTC signaling to one peer
+///   cocord/v1/<freq>/b            room broadcast (hello/bye/chat/tx/snd/bx)
+///   cocord/v1/<freq>/s/<peerId>   direct WebRTC signaling to one peer
 class Signaling {
   static const List<(String, int)> publicBrokers = [
     ('broker.emqx.io', 1883),
@@ -104,7 +104,7 @@ class Signaling {
     }
   }
 
-  String _base(String room) => 'freqwave/v1/$room';
+  String _base(String room) => 'cocord/v1/$room';
 
   /// Enter a frequency room (leaving the previous one).
   void joinRoom(String room) {

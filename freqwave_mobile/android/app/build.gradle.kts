@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.freqwave.app"
+    namespace = "com.cocord.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -17,7 +17,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.freqwave.app"
+        applicationId = "com.cocord.app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

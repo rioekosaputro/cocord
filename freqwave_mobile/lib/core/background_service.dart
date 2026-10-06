@@ -12,9 +12,9 @@ class BackgroundService {
     if (_inited) return;
     FlutterForegroundTask.init(
       androidNotificationOptions: AndroidNotificationOptions(
-        channelId: 'freqwave_radio',
-        channelName: 'FreqWave Radio',
-        channelDescription: 'Shown while FreqWave is tuned in to a frequency.',
+        channelId: 'cocord_radio',
+        channelName: 'Cocord Radio',
+        channelDescription: 'Shown while Cocord is tuned in to a frequency.',
         channelImportance: NotificationChannelImportance.LOW,
         priority: NotificationPriority.LOW,
         onlyAlertOnce: true,
@@ -51,7 +51,7 @@ class BackgroundService {
     try {
       if (await FlutterForegroundTask.isRunningService) {
         await FlutterForegroundTask.updateService(
-          notificationTitle: 'FreqWave // ON AIR',
+          notificationTitle: 'Cocord // ON AIR',
           notificationText: text,
         );
         return;
@@ -62,7 +62,7 @@ class BackgroundService {
           if (micGranted) ForegroundServiceTypes.microphone,
           ForegroundServiceTypes.mediaPlayback,
         ],
-        notificationTitle: 'FreqWave // ON AIR',
+        notificationTitle: 'Cocord // ON AIR',
         notificationText: text,
       );
       if (result is ServiceRequestFailure) {

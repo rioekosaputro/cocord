@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:freqwave_mobile/core/models.dart';
+import 'package:cocord/core/models.dart';
 
 void main() {
   test('Freq.clamp keeps value in range and rounds to 3 decimals', () {

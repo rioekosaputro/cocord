@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 echo ========================================================
-echo   FREQWAVE // Android ARM64 Release APK Auto-Builder
+echo   COCORD // Android ARM64 Release APK Auto-Builder
 echo ========================================================
 echo.
 

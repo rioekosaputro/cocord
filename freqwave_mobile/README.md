@@ -1,4 +1,4 @@
-# FreqWave Mobile
+# Cocord Mobile
 
 Walkie-talkie voice, frequency chat and a synced boombox for Android.
 Everyone tuned to the same frequency (e.g. 144.800 MHz) is in the same room.
@@ -34,7 +34,7 @@ flutter build apk --release --target-platform android-arm64 --split-per-abi
 
 Output: `build/app/outputs/flutter-apk/app-arm64-v8a-release.apk` (Android 7.0+).
 
-Release signing uses `android/key.properties` + `android/app/freqwave-release.jks`
+Release signing uses `android/key.properties` + `android/app/cocord-release.jks`
 (git-ignored). **Back both up**: without them you can't ship updates over an installed app.
 
 ## Development

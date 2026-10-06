@@ -1,4 +1,4 @@
-# AGENTS.md — FreqWave Mobile engineering rules
+# AGENTS.md — Cocord Mobile engineering rules
 
 Rules for anyone (human or AI agent) changing this Flutter app. Follow them on every change. If a rule must be broken, explain why in the PR/commit message.
 
@@ -64,11 +64,11 @@ test/                       mirrors lib/ one-to-one
 - Treat every incoming MQTT/WebRTC payload as hostile: validate type, length and allowed values; cap chat text (500), callsign (12), payload size (24 KB); rate-limit remote soundboard triggers.
 - Never log message contents, SDP, credentials or TURN secrets.
 - Secrets (keystore, `key.properties`, TURN passwords) are never committed; they are git-ignored.
-- Protocol changes bump the topic version (`freqwave/v1` → `v2`) and stay backward-safe for one release.
+- Protocol changes bump the topic version (`cocord/v1` → `v2`) and stay backward-safe for one release.
 
 ## 6. Android
 
-- Application id / namespace: `com.freqwave.app` — do not change it (breaks updates).
+- Application id / namespace: `com.cocord.app` — do not change it (breaks updates).
 - Runtime permissions are requested at the moment of need, with a clear explanation, and denial must degrade gracefully (listen-only mode without mic).
 - Foreground service types in the manifest must match the permissions requested.
 - Release builds are signed with `android/key.properties`; **back up the keystore** — losing it means users can't update.

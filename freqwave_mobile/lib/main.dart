@@ -19,7 +19,7 @@ void main() {
       create: (_) => RadioController()
         ..toast = _showToast
         ..init(),
-      child: const FreqWaveApp(),
+      child: const CocordApp(),
     ),
   );
 }
@@ -30,13 +30,13 @@ void _showToast(String message) {
     ..showSnackBar(SnackBar(content: Text(message)));
 }
 
-class FreqWaveApp extends StatelessWidget {
-  const FreqWaveApp({super.key});
+class CocordApp extends StatelessWidget {
+  const CocordApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'FreqWave',
+      title: 'Cocord',
       debugShowCheckedModeBanner: false,
       scaffoldMessengerKey: messengerKey,
       theme: AppTheme.dark,

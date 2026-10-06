@@ -4,7 +4,7 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:freqwave_mobile/core/signaling.dart';
+import 'package:cocord/core/signaling.dart';
 
 void main() {
   test('two clients exchange chat and direct signals', _run,

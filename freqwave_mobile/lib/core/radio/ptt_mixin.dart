@@ -7,7 +7,7 @@ import 'radio_base.dart';
 
 /// Push-to-talk: on-screen button, open mic and hardware keys.
 mixin PttMixin on RadioBase, BoomboxMixin {
-  static const _channel = MethodChannel('com.freqwave.app/hardware_ptt');
+  static const _channel = MethodChannel('com.cocord.app/hardware_ptt');
   static const _micTail = Duration(milliseconds: 150);
 
   Timer? _micRelease;

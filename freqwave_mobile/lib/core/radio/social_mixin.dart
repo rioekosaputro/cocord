@@ -41,7 +41,7 @@ mixin SocialMixin on RadioBase, BoomboxMixin {
 
   Future<void> shareFrequency() async {
     await Clipboard.setData(ClipboardData(
-        text: 'Join me on FreqWave: tune to $freqLabel MHz'));
+        text: 'Join me on Cocord: tune to $freqLabel MHz'));
     toast?.call('Frequency copied to clipboard');
   }
 }
