@@ -1,0 +1,23 @@
+# Flutter & Dart artifacts
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+*.apk
+*.aab
+
+# Android Gradle
+.gradle/
+local.properties
+**/android/app/build/
+**/android/.gradle/
+**/android/captures/
+**/android/gradle/wrapper/gradle-wrapper.jar
+
+# IDE & OS
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+*.log

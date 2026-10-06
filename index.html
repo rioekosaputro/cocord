@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FreqWave 📻 // Tactical Radio Comms & Synced Boombox</title>
+  <meta name="description" content="Next-Gen Discord meets Tactical Walkie-Talkie Radio & Synchronized Music Boombox. Tune frequencies, PTT with authentic DSP squelch, and listen together.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=JetBrains+Mono:wght@400;600;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- PeerJS for real-time P2P WebRTC audio comms -->
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+</head>
+<body class="cyber-theme">
+  <!-- Scanline CRT Effect Overlay -->
+  <div class="crt-overlay"></div>
+  <div class="ambient-glow"></div>
+
+  <div id="app" class="app-container">
+    
+    <!-- TOP HEADER / STATUS BAR -->
+    <header class="tactical-header">
+      <div class="brand-section">
+        <div class="radio-icon-pulse">
+          <span class="pulse-ring"></span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5M19.1 4.9C23 8.8 23 15.2 19.1 19.1M12 12h.01"/>
+          </svg>
+        </div>
+        <div class="brand-title">
+          <h1>Freq<span>Wave</span></h1>
+          <p class="subtitle">Radio Voice & Synced Audio Hub</p>
+        </div>
+      </div>
+
+      <!-- Live Global Frequency Readout -->
+      <div class="freq-hud-display" id="freq-hud">
+        <div class="hud-label">FREQUENCY</div>
+        <div class="hud-value"><span id="hud-freq-val">144.800</span> <span class="unit">MHz</span></div>
+        <div class="hud-sub" id="hud-sub-val">Squad Channel Alpha</div>
+      </div>
+
+      <!-- Identity & Connection Status -->
+      <div class="status-panel">
+        <div class="callsign-badge">
+          <span class="label">CALLSIGN:</span>
+          <input type="text" id="callsign-input" value="BRAVO-06" maxlength="12" title="Click to change your callsign">
+        </div>
+        <div class="connection-status" id="net-status">
+          <span class="status-dot online"></span>
+          <span class="status-text">NETWORK ONLINE</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN INTERFACE GRID -->
+    <main class="main-grid">
+      
+      <!-- LEFT COLUMN: FREQUENCY TUNER & SQUAD CHANNELS -->
+      <aside class="panel channel-panel">
+        <div class="panel-header">
+          <h2><span class="icon">📡</span> FREQ CHANNELS</h2>
+          <button id="btn-scan" class="btn-tactical btn-xs" title="Scan through active frequencies">SCANNER</button>
+        </div>
+
+        <!-- Frequency Quick Dial Presets -->
+        <div class="preset-list" id="preset-list">
+          <div class="preset-card active" data-freq="144.800" data-name="Squad Tactical Alpha" data-desc="VHF Comms Primary">
+            <div class="preset-freq">144.800 MHz</div>
+            <div class="preset-info">
+              <span class="preset-name">Squad Alpha</span>
+              <span class="peer-count"><span class="user-icon">👥</span> <span class="count">4</span></span>
+            </div>
+          </div>
+          <div class="preset-card" data-freq="433.920" data-name="Lofi Cyberpunk Cafe" data-desc="Chill Music & Casual Comms">
+            <div class="preset-freq">433.920 MHz</div>
+            <div class="preset-info">
+              <span class="preset-name">Lofi Cafe FM</span>
+              <span class="peer-count"><span class="user-icon">👥</span> <span class="count">12</span></span>
+            </div>
+          </div>
+          <div class="preset-card" data-freq="98.500" data-name="Synthwave Overdrive" data-desc="High Energy Beats Sync">
+            <div class="preset-freq">98.500 MHz</div>
+            <div class="preset-info">
+              <span class="preset-name">Synthwave FM</span>
+              <span class="peer-count"><span class="user-icon">👥</span> <span class="count">8</span></span>
+            </div>
+          </div>
+          <div class="preset-card" data-freq="121.500" data-name="Emergency Airband" data-desc="Open SOS & Broadcasts">
+            <div class="preset-freq">121.500 MHz</div>
+            <div class="preset-info">
+              <span class="preset-name">Emergency Guard</span>
+              <span class="peer-count"><span class="user-icon">👥</span> <span class="count">2</span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Manual Frequency Step & Rotary Control -->
+        <div class="manual-tuner-box">
+          <div class="tuner-title">MANUAL TUNING</div>
+          <div class="tuner-controls">
+            <button id="btn-freq-down" class="btn-tactical btn-step">- 0.05</button>
+            <input type="number" id="manual-freq-input" value="144.80" step="0.025" min="88.0" max="999.0">
+            <button id="btn-freq-up" class="btn-tactical btn-step">+ 0.05</button>
+          </div>
+          <input type="range" id="freq-slider" min="88.0" max="500.0" step="0.1" value="144.8" class="cyber-slider">
+        </div>
+
+        <!-- Tuned Peers in Frequency -->
+        <div class="tuned-peers-section">
+          <div class="section-subtitle">UNITS ON CURRENT FREQ</div>
+          <ul class="peer-list" id="peer-list">
+            <li class="peer-item local-user">
+              <div class="peer-avatar"><span class="avatar-char">B</span><span class="tx-indicator"></span></div>
+              <div class="peer-details">
+                <span class="peer-name" id="local-peer-name">BRAVO-06 (You)</span>
+                <span class="peer-role">SQUAD LEAD // TX READY</span>
+              </div>
+              <div class="signal-meter"><div class="bars full"></div></div>
+            </li>
+            <li class="peer-item">
+              <div class="peer-avatar"><span class="avatar-char">V</span></div>
+              <div class="peer-details">
+                <span class="peer-name">VIPER-2</span>
+                <span class="peer-role">RECON // LISTENING</span>
+              </div>
+              <div class="signal-meter"><div class="bars high"></div></div>
+            </li>
+            <li class="peer-item">
+              <div class="peer-avatar"><span class="avatar-char">G</span></div>
+              <div class="peer-details">
+                <span class="peer-name">GHOST-9</span>
+                <span class="peer-role">SUPPORT // LISTENING</span>
+              </div>
+              <div class="signal-meter"><div class="bars med"></div></div>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- CENTER COLUMN: TACTICAL RADIO TRANSMITTER & DSP ENGINE -->
+      <section class="panel center-deck">
+        
+        <!-- Live Visualizer / CRT Oscilloscope -->
+        <div class="oscilloscope-container">
+          <div class="scope-header">
+            <div class="scope-title">RF SPECTRUM & AUDIO OSCILLOSCOPE</div>
+            <div class="scope-badges">
+              <span class="badge" id="dsp-filter-badge">BANDPASS: 300-3400Hz</span>
+              <span class="badge badge-amber" id="squelch-badge">SQUELCH: AUTO</span>
+              <span class="badge badge-red" id="tx-status-badge">RX (STANDBY)</span>
+            </div>
+          </div>
+          
+          <div class="canvas-wrapper">
+            <canvas id="scope-canvas" width="800" height="180"></canvas>
+            <div class="reticle-grid"></div>
+            <div class="vumeter-overlay">
+              <div class="vu-bar" id="vu-meter"><div class="vu-fill" id="vu-fill"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PUSH TO TALK / WALKIE TALKIE CONTROL CONSOLE -->
+        <div class="walkie-console">
+          
+          <!-- Tactical PTT Big Button -->
+          <div class="ptt-zone">
+            <button id="btn-ptt" class="ptt-button" type="button">
+              <div class="ptt-inner">
+                <div class="ptt-icon">
+                  <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" y1="19" x2="12" y2="23"/>
+                    <line x1="8" y1="23" x2="16" y2="23"/>
+                  </svg>
+                </div>
+                <div class="ptt-label" id="ptt-text">PUSH TO TALK</div>
+                <div class="ptt-hint">[SPACEBAR] or HOLD MOUSE</div>
+              </div>
+              <div class="ptt-rings"></div>
+            </button>
+          </div>
+
+          <!-- DSP Effects & Radio Audio Modulation Settings -->
+          <div class="dsp-controls-panel">
+            <div class="dsp-title">DSP RADIO AUDIO MODULATION</div>
+            
+            <div class="dsp-grid">
+              <div class="toggle-control">
+                <label class="switch">
+                  <input type="checkbox" id="toggle-radio-filter" checked>
+                  <span class="slider round"></span>
+                </label>
+                <div class="toggle-label">
+                  <span class="name">Tactical Bandpass</span>
+                  <span class="desc">Authentic 300Hz-3.4kHz Radio Tone</span>
+                </div>
+              </div>
+
+              <div class="toggle-control">
+                <label class="switch">
+                  <input type="checkbox" id="toggle-roger-beep" checked>
+                  <span class="slider round"></span>
+                </label>
+                <div class="toggle-label">
+                  <span class="name">Roger Beep (Chirp)</span>
+                  <span class="desc">Dual-tone end transmission burst</span>
+                </div>
+              </div>
+
+              <div class="toggle-control">
+                <label class="switch">
+                  <input type="checkbox" id="toggle-squelch-burst" checked>
+                  <span class="slider round"></span>
+                </label>
+                <div class="toggle-label">
+                  <span class="name">Squelch Tail Noise</span>
+                  <span class="desc">Analog RF carrier cut off burst</span>
+                </div>
+              </div>
+
+              <div class="toggle-control">
+                <label class="switch">
+                  <input type="checkbox" id="toggle-static" checked>
+                  <span class="slider round"></span>
+                </label>
+                <div class="toggle-label">
+                  <span class="name">RF Ambient Static</span>
+                  <span class="desc">Atmospheric white noise overlay</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Volume & Squelch Sliders -->
+            <div class="sliders-row">
+              <div class="slider-group">
+                <div class="slider-header">
+                  <span>RADIO STATIC VOL</span>
+                  <span id="static-vol-val">12%</span>
+                </div>
+                <input type="range" id="slider-static-vol" min="0" max="50" value="12" class="cyber-slider">
+              </div>
+              <div class="slider-group">
+                <div class="slider-header">
+                  <span>MIC GAIN BOOST</span>
+                  <span id="mic-gain-val">100%</span>
+                </div>
+                <input type="range" id="slider-mic-gain" min="50" max="250" value="100" class="cyber-slider">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SYNCHRONIZED BOOMBOX / JUKEBOX PLAYER -->
+        <div class="boombox-deck">
+          <div class="boombox-header">
+            <div class="deck-title">
+              <span class="icon">📻</span> SYNCED FREQUENCY BOOMBOX
+              <span class="badge badge-synced">SYNCED TO FREQ</span>
+            </div>
+            <div class="auto-ducking-indicator" id="ducking-indicator">
+              <span class="duck-dot"></span> AUTO-DUCKING ARMED
+            </div>
+          </div>
+
+          <div class="track-display">
+            <div class="track-art">
+              <div class="vinyl-disc" id="vinyl-disc"></div>
+            </div>
+            <div class="track-meta">
+              <div class="track-title" id="track-title">Cyber City Neon Nights</div>
+              <div class="track-artist" id="track-artist">FreqWave Synthwave Radio // 24/7 Stream</div>
+              <div class="track-progress-bar">
+                <div class="progress-fill" id="track-progress"></div>
+              </div>
+              <div class="track-time">
+                <span id="time-current">01:24</span> / <span id="time-total">03:45</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="boombox-controls">
+            <div class="music-btns">
+              <button id="btn-prev-track" class="btn-tactical btn-circle" title="Previous Station">⏮</button>
+              <button id="btn-play-music" class="btn-tactical btn-circle btn-primary" title="Play / Pause Synced Music">▶</button>
+              <button id="btn-next-track" class="btn-tactical btn-circle" title="Next Station">⏭</button>
+            </div>
+            
+            <!-- Music Station Preset Selector -->
+            <div class="station-selector">
+              <select id="music-station-select" class="cyber-select">
+                <option value="station-synth">⚡ Synthwave Radio (Overdrive Mix)</option>
+                <option value="station-lofi">☕ Lofi Hip Hop Beats (Chill Radio)</option>
+                <option value="station-cyber">🦾 Cyberpunk Industrial Bass</option>
+                <option value="station-ambient">🌌 Deep Space Tactical Ambient</option>
+              </select>
+            </div>
+
+            <!-- Music Volume Slider -->
+            <div class="music-volume-group">
+              <span>🔊</span>
+              <input type="range" id="music-volume-slider" min="0" max="100" value="65" class="cyber-slider">
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- RIGHT COLUMN: DISCORD-STYLE TACTICAL CHAT & SOUNDBOARD -->
+      <aside class="panel chat-panel">
+        
+        <!-- Tactical Soundboard Drops -->
+        <div class="soundboard-section">
+          <div class="panel-header">
+            <h2><span class="icon">🔊</span> TACTICAL SOUNDBOARD</h2>
+          </div>
+          <div class="soundboard-grid">
+            <button class="sound-pad" data-sound="roger">📻 Roger That</button>
+            <button class="sound-pad" data-sound="airhorn">📯 Airhorn Drop</button>
+            <button class="sound-pad" data-sound="siren">🚨 Red Alert</button>
+            <button class="sound-pad" data-sound="morse">📡 SOS Morse</button>
+            <button class="sound-pad" data-sound="target">🎯 Locked On</button>
+            <button class="sound-pad" data-sound="glitch">⚡ EMP Glitch</button>
+          </div>
+        </div>
+
+        <!-- Tactical Frequency Chat Stream -->
+        <div class="chat-section">
+          <div class="panel-header">
+            <h2><span class="icon">💬</span> FREQ CHAT FEED</h2>
+            <span class="freq-tag" id="chat-freq-tag">#144.800</span>
+          </div>
+
+          <!-- Chat Messages Container -->
+          <div class="chat-messages" id="chat-messages">
+            <div class="chat-msg system">
+              <span class="time">13:00</span>
+              <span class="body">📡 Tuned to frequency 144.800 MHz. Audio encryption active.</span>
+            </div>
+            <div class="chat-msg">
+              <div class="msg-header">
+                <span class="callsign viper">VIPER-2</span>
+                <span class="time">13:02</span>
+              </div>
+              <div class="msg-body">All units check in on 144.8. Boombox is tuned to Synthwave.</div>
+            </div>
+            <div class="chat-msg">
+              <div class="msg-header">
+                <span class="callsign ghost">GHOST-9</span>
+                <span class="time">13:04</span>
+              </div>
+              <div class="msg-body">Copy that. Audio squelch crystal clear on this frequency.</div>
+            </div>
+          </div>
+
+          <!-- Chat Input Bar -->
+          <form id="chat-form" class="chat-input-row">
+            <input type="text" id="chat-input" placeholder="Transmit message to frequency..." autocomplete="off">
+            <button type="submit" class="btn-tactical btn-primary">SEND</button>
+          </form>
+        </div>
+
+      </aside>
+
+    </main>
+
+    <!-- BOTTOM TACTICAL TOOLBAR -->
+    <footer class="tactical-footer">
+      <div class="footer-left">
+        <span class="keyboard-tip">💡 <strong>HOTKEY:</strong> Hold <kbd>SPACEBAR</kbd> anywhere to transmit PTT</span>
+        <span class="divider">|</span>
+        <span class="rssi-info">SIGNAL RSSI: <strong id="rssi-val">-48 dBm</strong> (EXCELLENT)</span>
+      </div>
+      <div class="footer-right">
+        <button id="btn-open-mic" class="btn-tactical btn-xs">OPEN MIC: OFF</button>
+        <button id="btn-mute-all" class="btn-tactical btn-xs">MUTE AUDIO</button>
+        <button id="btn-share-freq" class="btn-tactical btn-xs btn-highlight" title="Copy frequency share link">SHARE FREQUENCY 🔗</button>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- APPLICATION JAVASCRIPT MODULES -->
+  <script src="audioEngine.js"></script>
+  <script src="musicPlayer.js"></script>
+  <script src="chatEngine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
