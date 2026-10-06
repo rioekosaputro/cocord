@@ -5,7 +5,7 @@ import '../settings.dart';
 import 'boombox_mixin.dart';
 import 'devices_mixin.dart';
 import 'incoming_mixin.dart';
-import 'ptt_mixin.dart';
+import 'voice_mixin.dart';
 import 'radio_base.dart';
 import 'session_mixin.dart';
 import 'rooms_mixin.dart';
@@ -15,7 +15,7 @@ import 'social_mixin.dart';
 class RadioController extends RadioBase
     with
         BoomboxMixin,
-        PttMixin,
+        VoiceMixin,
         IncomingMixin,
         SessionMixin,
         RoomsMixin,
@@ -30,7 +30,6 @@ class RadioController extends RadioBase
     attachHardwareKeys();
     settings.remember(settings.room);
     unawaited(attachLinks());
-    await sfx.setStatic(settings.staticNoise, settings.staticVolume);
     ready = true;
     notifyListeners();
     unawaited(join());
@@ -56,23 +55,6 @@ class RadioController extends RadioBase
     _persist();
   }
 
-  void setRogerBeep(bool v) {
-    settings.rogerBeep = v;
-    _persist();
-  }
-
-  void setSquelch(bool v) {
-    settings.squelch = v;
-    _persist();
-  }
-
-  void setStatic(bool on, [double? volume]) {
-    settings.staticNoise = on;
-    settings.staticVolume = volume ?? settings.staticVolume;
-    sfx.setStatic(on, settings.staticVolume);
-    _persist();
-  }
-
   void setSyncBoombox(bool v) {
     settings.syncBoombox = v;
     _persist();
@@ -92,14 +74,6 @@ class RadioController extends RadioBase
     settings.turnPass = turnPass;
     _persist();
     toast?.call('Network settings apply the next time you tune in');
-  }
-
-  Future<void> toggleMute() async {
-    muted = !muted;
-    await sfx.setMuted(muted);
-    mesh?.setRemoteMuted(muted);
-    updateDuck();
-    notifyListeners();
   }
 
   Future<void> reconnect() async {

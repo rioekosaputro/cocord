@@ -26,9 +26,8 @@ abstract class RadioBase extends ChangeNotifier {
   bool joined = false;
   bool joining = false;
   bool micGranted = false;
-  bool muted = false;
+  bool isDeafened = false;
   bool transmitting = false;
-  bool openMic = false;
   bool chatVisible = false;
   int unread = 0;
   String? error;

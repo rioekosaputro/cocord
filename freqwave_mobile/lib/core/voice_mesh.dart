@@ -5,6 +5,13 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import 'signaling.dart';
 
+/// Instantaneous audio levels (0..1) for the local mic and each remote peer.
+class AudioLevels {
+  final double local;
+  final Map<String, double> remote;
+  const AudioLevels(this.local, this.remote);
+}
+
 class _Link {
   final String peerId;
   final bool offerer;
@@ -68,6 +75,27 @@ class VoiceMesh {
     for (final t in _remoteTracks) {
       t.enabled = !muted;
     }
+  }
+
+  /// Reads WebRTC stats to find out who is making sound right now.
+  Future<AudioLevels> levels() async {
+    var local = 0.0;
+    final remote = <String, double>{};
+    for (final e in _links.entries.toList()) {
+      final pc = e.value.pc;
+      if (pc == null) continue;
+      try {
+        for (final r in await pc.getStats()) {
+          final lv = r.values['audioLevel'];
+          if (lv is! num) continue;
+          if (r.type == 'inbound-rtp') remote[e.key] = lv.toDouble();
+          if (r.type == 'media-source' && lv > local) local = lv.toDouble();
+        }
+      } catch (_) {
+        // The link may be closing; skip this tick.
+      }
+    }
+    return AudioLevels(local, remote);
   }
 
   bool isLinked(String peerId) => _links.containsKey(peerId);

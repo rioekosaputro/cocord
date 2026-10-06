@@ -21,8 +21,6 @@ mixin IncomingMixin on RadioBase, BoomboxMixin {
         _onBye(id);
       case 'chat':
         _onChat(id, m);
-      case 'tx':
-        _onTx(id, m);
       case 'snd':
         _onSound(id, m);
       case 'bx':
@@ -70,6 +68,7 @@ mixin IncomingMixin on RadioBase, BoomboxMixin {
   }
 
   void _announceJoin(Peer peer, Json m) {
+    sfx.joinChime();
     addSystem('${peer.name} joined');
     final bx = m['bx'];
     if (bx is Map) applyRemoteBoombox(Map<String, dynamic>.from(bx));
@@ -78,7 +77,10 @@ mixin IncomingMixin on RadioBase, BoomboxMixin {
   void _onBye(String id) {
     final peer = peers.remove(id);
     mesh?.drop(id);
-    if (peer != null) addSystem('${peer.name} left');
+    if (peer != null) {
+      sfx.leaveChime();
+      addSystem('${peer.name} left');
+    }
     updateDuck();
     notifyListeners();
   }
@@ -87,29 +89,6 @@ mixin IncomingMixin on RadioBase, BoomboxMixin {
     final text = MsgUtils.str(m['x'], Limits.maxChat);
     if (text == null) return;
     addMessage(ChatKind.remote, _name(m), text, _color(m));
-  }
-
-  void _onTx(String id, Json m) {
-    final peer = peers[id];
-    if (peer == null) return;
-    final on = MsgUtils.flag(m['on']);
-    if (peer.transmitting == on) return;
-    peer.transmitting = on;
-    peer.txSince = on ? DateTime.now() : null;
-    _remoteTone(on);
-    updateDuck();
-    notifyListeners();
-  }
-
-  void _remoteTone(bool on) {
-    if (on) {
-      if (settings.squelch) sfx.squelchKeyup();
-      return;
-    }
-    if (settings.rogerBeep) sfx.rogerBeep();
-    if (settings.squelch) {
-      Future.delayed(const Duration(milliseconds: 150), sfx.squelchTail);
-    }
   }
 
   void _onSound(String id, Json m) {

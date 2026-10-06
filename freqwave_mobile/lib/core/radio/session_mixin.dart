@@ -7,12 +7,12 @@ import '../models.dart';
 import '../signaling.dart';
 import '../voice_mesh.dart';
 import 'boombox_mixin.dart';
-import 'ptt_mixin.dart';
+import 'voice_mixin.dart';
 import 'radio_base.dart';
 
 /// Connecting to / leaving the room: permissions, MQTT link, voice mesh,
 /// presence heartbeat and the background service.
-mixin SessionMixin on RadioBase, BoomboxMixin, PttMixin {
+mixin SessionMixin on RadioBase, BoomboxMixin, VoiceMixin {
   static const _helloEvery = Duration(seconds: 10);
   static const _pruneEvery = Duration(seconds: 5);
   static const _roomDebounce = Duration(milliseconds: 400);
@@ -38,6 +38,8 @@ mixin SessionMixin on RadioBase, BoomboxMixin, PttMixin {
     joined = true;
     joining = false;
     _startTimers();
+    startMonitor();
+    sfx.joinChime();
     await BackgroundService.start(text: _status(), micGranted: micGranted);
     notifyListeners();
   }
@@ -72,7 +74,8 @@ mixin SessionMixin on RadioBase, BoomboxMixin, PttMixin {
     );
     mesh = voice;
     if (micGranted) micGranted = await voice.start();
-    voice.setRemoteMuted(muted);
+    voice.setRemoteMuted(isDeafened);
+    applyMic();
     await onVoiceReady();
   }
 
@@ -152,7 +155,8 @@ mixin SessionMixin on RadioBase, BoomboxMixin, PttMixin {
     _pruneTimer?.cancel();
     _switchTimer?.cancel();
     signaling?.sendBroadcast({'t': 'bye'});
-    releaseMicNow();
+    stopVoice();
+    sfx.leaveChime();
     onVoiceStopped();
     await mesh?.dispose();
     await signaling?.dispose();

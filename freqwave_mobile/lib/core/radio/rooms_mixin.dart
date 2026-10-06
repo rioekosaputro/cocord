@@ -2,13 +2,13 @@ import 'package:flutter/services.dart';
 
 import '../room.dart';
 import 'boombox_mixin.dart';
-import 'ptt_mixin.dart';
+import 'voice_mixin.dart';
 import 'radio_base.dart';
 import 'session_mixin.dart';
 
 /// Switching rooms: join by name/password, by pasted invite, or by tapping a
 /// `cocord://join` link.
-mixin RoomsMixin on RadioBase, BoomboxMixin, PttMixin, SessionMixin {
+mixin RoomsMixin on RadioBase, BoomboxMixin, VoiceMixin, SessionMixin {
   static const _links = MethodChannel('com.cocord.app/links');
 
   void enterRoom(RoomInfo room) {

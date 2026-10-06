@@ -11,11 +11,9 @@ class AppSettings {
   RoomInfo room = const RoomInfo(RoomInfo.defaultName);
   List<RoomInfo> recents = [];
 
+  /// false = open mic like a voice call; true = hold a button to talk.
+  bool pttMode = false;
   bool volumeKeyPtt = true;
-  bool rogerBeep = true;
-  bool squelch = true;
-  bool staticNoise = false;
-  double staticVolume = 0.12;
   double boomboxVolume = 0.65;
   int station = 0;
   bool syncBoombox = true;
@@ -53,11 +51,8 @@ class AppSettings {
   }
 
   void _loadAudio(SharedPreferences p) {
+    pttMode = p.getBool('pttMode') ?? pttMode;
     volumeKeyPtt = p.getBool('volumeKeyPtt') ?? volumeKeyPtt;
-    rogerBeep = p.getBool('rogerBeep') ?? rogerBeep;
-    squelch = p.getBool('squelch') ?? squelch;
-    staticNoise = p.getBool('staticNoise') ?? staticNoise;
-    staticVolume = p.getDouble('staticVolume') ?? staticVolume;
     boomboxVolume = p.getDouble('boomboxVolume') ?? boomboxVolume;
     station = (p.getInt('station') ?? 0).clamp(0, kStations.length - 1);
     syncBoombox = p.getBool('syncBoombox') ?? syncBoombox;
@@ -104,11 +99,8 @@ class AppSettings {
   }
 
   Future<void> _saveAudio(SharedPreferences p) async {
+    await p.setBool('pttMode', pttMode);
     await p.setBool('volumeKeyPtt', volumeKeyPtt);
-    await p.setBool('rogerBeep', rogerBeep);
-    await p.setBool('squelch', squelch);
-    await p.setBool('staticNoise', staticNoise);
-    await p.setDouble('staticVolume', staticVolume);
     await p.setDouble('boomboxVolume', boomboxVolume);
     await p.setInt('station', station);
     await p.setBool('syncBoombox', syncBoombox);

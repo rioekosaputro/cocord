@@ -82,7 +82,7 @@ mixin BoomboxMixin on RadioBase {
   @override
   void updateDuck() {
     final duck = transmitting || anyRemoteTx;
-    final base = muted ? 0.0 : settings.boomboxVolume;
+    final base = isDeafened ? 0.0 : settings.boomboxVolume;
     player.setVolume(duck ? base * _duckFactor : base);
   }
 
