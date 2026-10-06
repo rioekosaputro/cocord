@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> {
           onDestinationSelected: _select,
           destinations: [
             const NavigationDestination(
-                icon: Icon(Icons.settings_input_antenna), label: 'Radio'),
+                icon: Icon(Icons.headset_mic), label: 'Voice'),
             NavigationDestination(
               icon: Badge(
                 isLabelVisible: unread > 0 && _tab != 1,

@@ -121,31 +121,16 @@ class _AudioSwitches extends StatelessWidget {
     final s = r.settings;
     return Column(children: [
       SwitchListTile(
-        title: const Text('Volume-down key = push-to-talk'),
-        subtitle: const Text('Hold the volume-down button to talk'),
-        value: s.volumeKeyPtt,
-        onChanged: r.setVolumeKeyPtt,
+        title: const Text('Push-to-talk mode'),
+        subtitle: const Text('Hold a button to talk instead of an open mic'),
+        value: s.pttMode,
+        onChanged: r.setPttMode,
       ),
-      SwitchListTile(
-        title: const Text('Roger beep after talking'),
-        value: s.rogerBeep,
-        onChanged: r.setRogerBeep,
-      ),
-      SwitchListTile(
-        title: const Text('Radio squelch sounds'),
-        value: s.squelch,
-        onChanged: r.setSquelch,
-      ),
-      SwitchListTile(
-        title: const Text('Ambient static'),
-        value: s.staticNoise,
-        onChanged: (v) => r.setStatic(v),
-      ),
-      if (s.staticNoise)
-        Slider(
-          value: s.staticVolume,
-          max: 0.5,
-          onChanged: (v) => r.setStatic(true, v),
+      if (s.pttMode)
+        SwitchListTile(
+          title: const Text('Volume-down key = push-to-talk'),
+          value: s.volumeKeyPtt,
+          onChanged: r.setVolumeKeyPtt,
         ),
       SwitchListTile(
         title: const Text('Sync boombox with the room'),

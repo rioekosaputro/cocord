@@ -4,8 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/radio/radio_controller.dart';
 import '../theme.dart';
 import '../widgets/boombox_card.dart';
-import '../widgets/device_picker.dart';
-import '../widgets/oscilloscope.dart';
+import '../widgets/voice_bar.dart';
 import '../widgets/peers_card.dart';
 import '../widgets/ptt_button.dart';
 import '../widgets/room_header.dart';
@@ -22,11 +21,10 @@ class RadioPage extends StatelessWidget {
         _ConnectBanner(),
         RoomHeader(),
         SizedBox(height: 12),
-        _Scope(),
-        SizedBox(height: 12),
-        PttButton(),
-        _QuickToggles(),
         PeersCard(),
+        SizedBox(height: 12),
+        _PttSection(),
+        VoiceBar(),
         SizedBox(height: 12),
         BoomboxCard(),
         SizedBox(height: 16),
@@ -38,57 +36,17 @@ class RadioPage extends StatelessWidget {
   }
 }
 
-class _Scope extends StatelessWidget {
-  const _Scope();
+/// Big hold-to-talk button, only in push-to-talk mode.
+class _PttSection extends StatelessWidget {
+  const _PttSection();
 
   @override
   Widget build(BuildContext context) {
-    final r = context.watch<RadioController>();
-    final mode = r.transmitting
-        ? ScopeMode.transmitting
-        : (r.anyRemoteTx ? ScopeMode.receiving : ScopeMode.idle);
-    return Oscilloscope(mode: mode);
-  }
-}
-
-class _QuickToggles extends StatelessWidget {
-  const _QuickToggles();
-
-  @override
-  Widget build(BuildContext context) {
-    final r = context.watch<RadioController>();
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: FilterChip(
-              avatar: const Icon(Icons.mic, size: 16),
-              label: const Text('OPEN MIC'),
-              selected: r.openMic,
-              onSelected: r.setOpenMic,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: FilterChip(
-              avatar: Icon(r.muted ? Icons.volume_off : Icons.volume_up,
-                  size: 16),
-              label: Text(r.muted ? 'MUTED' : 'MUTE'),
-              selected: r.muted,
-              onSelected: (_) => r.toggleMute(),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: ActionChip(
-              avatar: const Icon(Icons.headset_mic, size: 16),
-              label: const Text('AUDIO'),
-              onPressed: () => showDeviceSheet(context),
-            ),
-          ),
-        ],
-      ),
+    final ptt = context.select<RadioController, bool>((r) => r.settings.pttMode);
+    if (!ptt) return const SizedBox.shrink();
+    return const Padding(
+      padding: EdgeInsets.only(bottom: 4),
+      child: PttButton(),
     );
   }
 }

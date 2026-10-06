@@ -12,7 +12,7 @@ class PttButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final r = context.watch<RadioController>();
-    final active = r.transmitting;
+    final active = r.pttHeld;
     return Listener(
       onPointerDown: (_) => r.startTransmit(),
       onPointerUp: (_) => r.stopTransmit(),
@@ -21,7 +21,7 @@ class PttButton extends StatelessWidget {
         duration: const Duration(milliseconds: 150),
         height: 110,
         decoration: _decoration(active),
-        child: _Label(active: active, openMic: r.openMic),
+        child: _Label(active: active),
       ),
     );
   }
@@ -53,8 +53,7 @@ class PttButton extends StatelessWidget {
 
 class _Label extends StatelessWidget {
   final bool active;
-  final bool openMic;
-  const _Label({required this.active, required this.openMic});
+  const _Label({required this.active});
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +64,7 @@ class _Label extends StatelessWidget {
         Icon(Icons.mic_none_rounded, size: 40, color: color),
         const SizedBox(height: 6),
         Text(
-          active ? 'TRANSMITTING' : 'HOLD TO TALK',
+          active ? 'TALKING…' : 'HOLD TO TALK',
           style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
@@ -73,7 +72,7 @@ class _Label extends StatelessWidget {
               color: color),
         ),
         Text(
-          openMic ? 'OPEN MIC ON' : 'OR VOLUME-DOWN / PTT KEY',
+          'OR USE THE VOLUME-DOWN KEY',
           style: TextStyle(
               fontFamily: kMono,
               fontSize: 9,
