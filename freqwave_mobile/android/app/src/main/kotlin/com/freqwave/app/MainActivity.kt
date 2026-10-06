@@ -10,6 +10,9 @@ class MainActivity : FlutterActivity() {
     private var channel: MethodChannel? = null
     private var volumeKeyEnabled = true
 
+    // KeyEvent.KEYCODE_PTT (API 35) is referenced by value so older SDKs compile.
+    private val KEYCODE_PTT = 286
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         channel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, channelName).also {
@@ -26,7 +29,7 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun isPttKey(keyCode: Int): Boolean =
-        keyCode == KeyEvent.KEYCODE_PTT ||
+        keyCode == KEYCODE_PTT ||
             (volumeKeyEnabled && keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {

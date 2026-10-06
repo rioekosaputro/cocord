@@ -1,57 +1,48 @@
-# 📻 FreqWave // Flutter Android Walkie-Talkie & Synced Boombox
+# FreqWave Mobile
 
-A simple, clean, and modern Android Walkie-Talkie and Synchronized Music app built with Flutter.
+Walkie-talkie voice, frequency chat and a synced boombox for Android.
+Everyone tuned to the same frequency (e.g. 144.800 MHz) is in the same room.
 
----
+## Features
 
-## ✨ Features
+- **Voice (PTT)**: hold the on-screen button, the volume-down key or a hardware PTT key. Live WebRTC audio, full mesh (up to 8 radios per frequency). Optional open-mic.
+- **Frequency tuning**: ±0.05 step, slider, type an exact value (88–999 MHz), presets, scanner that stops on activity.
+- **Chat**: live text chat per frequency, join/leave notices, unread badge.
+- **Synced boombox**: 4 internet radio stations; station and play/pause follow everyone on the frequency; music auto-ducks while anyone transmits.
+- **Soundboard**: airhorn, siren, Morse SOS, etc. played locally and dropped on the frequency.
+- **Radio sounds**: squelch bursts, roger beep, optional static (all synthesized on device, individually switchable).
+- **Background**: foreground service keeps the radio alive with the screen off.
+- **Listen-only mode** when the microphone permission is denied.
 
-- 📡 **Frequency Dialing**: Tune across virtual radio frequencies (e.g., `144.800 MHz`, `433.920 MHz`).
-- 🎙️ **Hardware & Screen PTT**: Push-to-Talk via on-screen button or physical **Volume Down / Walkie-Talkie side keys**.
-- 🎧 **Synchronized Boombox**: Listen to live music streams with friends on the same frequency.
-- 📉 **Auto-Ducking**: Music volume automatically lowers by 70% whenever someone speaks on the frequency.
-- 🔊 **Tactical Soundboard**: Instant audio drops (Roger Beep, Airhorn, Alert Siren, Morse SOS).
-- 💬 **Squad Frequency Chat**: Real-time frequency room chat feed.
+## How it works
 
----
+- Presence, chat and WebRTC signaling go through a public MQTT broker (`broker.emqx.io`, falling back to HiveMQ / Mosquitto); voice goes peer-to-peer over WebRTC.
+- **Privacy note:** frequencies are public rooms. Anyone who tunes to the same frequency can hear you and read chat. Pick an unusual frequency for private use, or set your own broker in *Settings → Advanced network*.
+- Calls use STUN only by default. On some mobile carriers / strict NATs a TURN server is needed for voice; add yours in *Settings → Advanced network*.
 
-## 🚀 How to Run on Android
+## Build the ARM64 APK
 
-### 1. Prerequisites
-- [Flutter SDK](https://docs.flutter.dev/get-started/install) (3.0.0+)
-- Android Studio / Android SDK with an Android device (Android 8.0+) or emulator.
+```bat
+build_apk_arm64.bat
+```
 
-### 2. Install Dependencies
+or
+
 ```bash
-cd freqwave_mobile
-flutter pub get
+flutter build apk --release --target-platform android-arm64 --split-per-abi
 ```
 
-### 3. Run on Device / Emulator
+Output: `build/app/outputs/flutter-apk/app-arm64-v8a-release.apk` (Android 7.0+).
+
+Release signing uses `android/key.properties` + `android/app/freqwave-release.jks`
+(git-ignored). **Back both up**: without them you can't ship updates over an installed app.
+
+## Development
+
+See [AGENTS.md](AGENTS.md) for structure, size limits and the definition of done.
+
 ```bash
-flutter run
-```
-
----
-
-## 📁 Project Structure
-
-```
-freqwave_mobile/
-├── android/
-│   └── app/src/main/
-│       ├── AndroidManifest.xml   # Audio, background & bluetooth permissions
-│       └── kotlin/.../MainActivity.kt # Volume Down / PTT hardware key intercept
-├── lib/
-│   ├── main.dart                 # App Entry point
-│   ├── core/
-│   │   ├── theme/tactical_theme.dart   # Clean Slate & Indigo Theme
-│   │   └── audio/radio_audio_manager.dart # Audio focus, PTT, and auto-ducking
-│   └── presentation/
-│       ├── screens/tactical_radio_screen.dart # Main clean radio interface
-│       └── widgets/
-│           ├── rf_oscilloscope.dart     # Clean sine waveform visualizer
-│           ├── ptt_button.dart          # Haptic PTT button
-│           └── boombox_card.dart        # Synced music player card
-└── pubspec.yaml
+flutter analyze
+flutter test
+flutter test tool/signaling_smoke_test.dart   # live broker check (needs internet)
 ```

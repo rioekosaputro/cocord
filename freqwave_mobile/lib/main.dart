@@ -1,19 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:provider/provider.dart';
-import 'core/theme/tactical_theme.dart';
-import 'core/audio/radio_audio_manager.dart';
-import 'presentation/screens/tactical_radio_screen.dart';
+
+import 'core/radio/radio_controller.dart';
+import 'ui/pages/home_page.dart';
+import 'ui/theme.dart';
+
+final GlobalKey<ScaffoldMessengerState> messengerKey =
+    GlobalKey<ScaffoldMessengerState>();
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  FlutterForegroundTask.initCommunicationPort();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => RadioAudioManager()),
-      ],
+    ChangeNotifierProvider(
+      create: (_) => RadioController()
+        ..toast = _showToast
+        ..init(),
       child: const FreqWaveApp(),
     ),
   );
+}
+
+void _showToast(String message) {
+  messengerKey.currentState
+    ?..hideCurrentSnackBar()
+    ..showSnackBar(SnackBar(content: Text(message)));
 }
 
 class FreqWaveApp extends StatelessWidget {
@@ -22,10 +36,11 @@ class FreqWaveApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'FreqWave Tactical Radio',
+      title: 'FreqWave',
       debugShowCheckedModeBanner: false,
-      theme: TacticalTheme.themeData,
-      home: const TacticalRadioScreen(),
+      scaffoldMessengerKey: messengerKey,
+      theme: AppTheme.dark,
+      home: const HomePage(),
     );
   }
 }
