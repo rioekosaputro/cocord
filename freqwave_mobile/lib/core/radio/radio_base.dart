@@ -42,6 +42,8 @@ abstract class RadioBase extends ChangeNotifier {
   void handleDirect(Json msg);
   Json boomboxState();
   void updateDuck();
+  Future<void> onVoiceReady();
+  void onVoiceStopped();
 
   bool get anyRemoteTx => peers.values.any((p) => p.transmitting);
 

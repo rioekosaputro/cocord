@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../core/radio/radio_controller.dart';
 import '../theme.dart';
+import '../widgets/device_picker.dart';
 import '../widgets/network_settings.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -15,6 +16,8 @@ class SettingsPage extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       children: const [
         _CallsignField(),
+        SizedBox(height: 16),
+        DevicePicker(),
         SizedBox(height: 8),
         _AudioSwitches(),
         _MicStatus(),

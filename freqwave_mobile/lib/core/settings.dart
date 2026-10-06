@@ -13,6 +13,10 @@ class AppSettings {
   int station = 0;
   bool syncBoombox = true;
 
+  /// Preferred audio devices, remembered by label (ids change between runs).
+  String inputLabel = '';
+  String outputLabel = '';
+
   /// Empty = use the built-in public broker list.
   String brokerHost = '';
   int brokerPort = 1883;
@@ -33,6 +37,8 @@ class AppSettings {
     s.boomboxVolume = p.getDouble('boomboxVolume') ?? s.boomboxVolume;
     s.station = (p.getInt('station') ?? 0).clamp(0, kStations.length - 1);
     s.syncBoombox = p.getBool('syncBoombox') ?? s.syncBoombox;
+    s.inputLabel = p.getString('inputLabel') ?? '';
+    s.outputLabel = p.getString('outputLabel') ?? '';
     s.brokerHost = p.getString('brokerHost') ?? '';
     s.brokerPort = p.getInt('brokerPort') ?? 1883;
     s.turnUrl = p.getString('turnUrl') ?? '';
@@ -53,6 +59,8 @@ class AppSettings {
     await p.setDouble('boomboxVolume', boomboxVolume);
     await p.setInt('station', station);
     await p.setBool('syncBoombox', syncBoombox);
+    await p.setString('inputLabel', inputLabel);
+    await p.setString('outputLabel', outputLabel);
     await p.setString('brokerHost', brokerHost);
     await p.setInt('brokerPort', brokerPort);
     await p.setString('turnUrl', turnUrl);

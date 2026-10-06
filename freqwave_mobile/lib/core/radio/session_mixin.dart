@@ -73,6 +73,7 @@ mixin SessionMixin on RadioBase, BoomboxMixin, PttMixin {
     mesh = voice;
     if (micGranted) micGranted = await voice.start();
     voice.setRemoteMuted(muted);
+    await onVoiceReady();
   }
 
   void _onLink(String peerId, String state) {
@@ -151,6 +152,7 @@ mixin SessionMixin on RadioBase, BoomboxMixin, PttMixin {
     _switchTimer?.cancel();
     signaling?.sendBroadcast({'t': 'bye'});
     releaseMicNow();
+    onVoiceStopped();
     await mesh?.dispose();
     await signaling?.dispose();
     mesh = null;

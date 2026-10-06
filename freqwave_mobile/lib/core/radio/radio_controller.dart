@@ -3,6 +3,7 @@ import 'dart:async';
 import '../models.dart';
 import '../settings.dart';
 import 'boombox_mixin.dart';
+import 'devices_mixin.dart';
 import 'incoming_mixin.dart';
 import 'ptt_mixin.dart';
 import 'radio_base.dart';
@@ -18,7 +19,8 @@ class RadioController extends RadioBase
         IncomingMixin,
         SessionMixin,
         TuningMixin,
-        SocialMixin {
+        SocialMixin,
+        DevicesMixin {
   bool ready = false;
 
   Future<void> init() async {

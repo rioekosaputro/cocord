@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/radio/radio_controller.dart';
 import '../theme.dart';
 import '../widgets/boombox_card.dart';
+import '../widgets/device_picker.dart';
 import '../widgets/freq_display.dart';
 import '../widgets/oscilloscope.dart';
 import '../widgets/peers_card.dart';
@@ -79,6 +80,14 @@ class _QuickToggles extends StatelessWidget {
               label: Text(r.muted ? 'MUTED' : 'MUTE'),
               selected: r.muted,
               onSelected: (_) => r.toggleMute(),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: ActionChip(
+              avatar: const Icon(Icons.headset_mic, size: 16),
+              label: const Text('AUDIO'),
+              onPressed: () => showDeviceSheet(context),
             ),
           ),
           const SizedBox(width: 8),
