@@ -1,11 +1,11 @@
 /**
- * FREQWAVE // Main App Coordinator & Event Controller
+ * COCORD // Main App Coordinator & Event Controller
  * Connects UI interactions, PTT hotkeys, Frequency dialers,
  * Scanner mode, and Audio DSP pipeline.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('[FreqWave] Initializing Tactical Radio System...');
+  console.log('[Cocord] Initializing Tactical Radio System...');
 
   // State
   let currentFreq = 144.800;

@@ -1,5 +1,5 @@
 /**
- * FREQWAVE // Synced Boombox & Media Player
+ * COCORD // Synced Boombox & Media Player
  * Handles synchronized radio streams, audio ducking during voice transmission,
  * and track metadata updates.
  */
@@ -29,7 +29,7 @@ class BoomboxPlayer {
       },
       'station-cyber': {
         title: 'Darksynth & Cybernetic Industrial Bass',
-        artist: 'FreqWave Military Band FX Station',
+        artist: 'Cocord Military Band FX Station',
         streamUrl: 'https://stream.nightride.fm/darksynth.m4a'
       },
       'station-ambient': {

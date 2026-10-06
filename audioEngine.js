@@ -1,5 +1,5 @@
 /**
- * FREQWAVE // Web Audio API DSP & Sound Effects Engine
+ * COCORD // Web Audio API DSP & Sound Effects Engine
  * Provides authentic radio walkie-talkie filtering, squelch bursts,
  * roger beeps, ambient static, and oscilloscope visualizers.
  */

@@ -1,5 +1,5 @@
 /**
- * FREQWAVE // Tactical Frequency Chat & P2P WebRTC Room Hub
+ * COCORD // Tactical Frequency Chat & P2P WebRTC Room Hub
  * Handles real-time text chat, callsigns, P2P WebRTC audio mesh on frequencies,
  * and ambient radio comms chatter.
  */
@@ -37,7 +37,7 @@ class ChatEngine {
     try {
       const sanitizedFreq = this.currentFrequency.replace('.', '_');
       const randomSuffix = Math.floor(Math.random() * 10000);
-      const peerId = `freqwave_${sanitizedFreq}_${randomSuffix}`;
+      const peerId = `cocord_${sanitizedFreq}_${randomSuffix}`;
 
       if (window.Peer) {
         this.peer = new window.Peer(peerId, {
