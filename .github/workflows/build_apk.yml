@@ -25,7 +25,6 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.x'
           channel: 'stable'
           cache: true
 
@@ -40,6 +39,6 @@ jobs:
       - name: Upload ARM64 APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: FreqWave-arm64-release-apk
+          name: Cocord-arm64-release-apk
           path: freqwave_mobile/build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
           if-no-files-found: error
