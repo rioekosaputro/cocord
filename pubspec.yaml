@@ -1,0 +1,29 @@
+name: cocord
+description: Cocord - Professional Real-Time Voice Rooms, WebRTC Mesh & Tactical Comms for Android.
+version: 1.0.0+1
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  google_fonts: ^6.1.0
+  flutter_webrtc: ^0.10.4
+  just_audio: ^0.9.36
+  audio_session: ^0.1.18
+  flutter_foreground_task: ^6.1.0
+  flutter_vibrate: ^1.3.0
+  provider: ^6.1.1
+  share_plus: ^9.0.0
+  app_links: ^6.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
